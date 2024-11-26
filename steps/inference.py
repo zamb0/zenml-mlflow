@@ -4,7 +4,7 @@ import torchvision
 from zenml import step
 
 @step
-def evaluate(val_dataset: torchvision.datasets.ImageFolder):
+def inference(val_dataset: torchvision.datasets.ImageFolder):
     logging.info('Evaluating model') 
     
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=4, shuffle=False)
