@@ -2,6 +2,7 @@ import logging
 import os
 import time
 import torch
+from typing import Tuple, Annotated
 from tempfile import TemporaryDirectory
 from torch import nn
 from torchvision import models
@@ -9,21 +10,23 @@ from abc import ABC, abstractmethod
 
 class Model(ABC):
     @abstractmethod
-    def train(self, train_loader, val_loader, **kwargs):
-        pass
-    
-    @abstractmethod
-    def evaluate(self, val_dataset):
+    def train_model(self, train_loader, val_loader, **kwargs):
         pass
 
 class CNN(Model):
     def __init__(self, num_classes):
         self.model = models.resnet18(weights='IMAGENET1K_V1')
-        self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
+        self.num_classes = num_classes
+        self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
     
-    def train(self, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0,0], device="cpu"):
+    # https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
+    def train_model(self, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0], device="cpu") \
+        -> Annotated[float, 'accuracy']:
         since = time.time()
         model = self.model.to(device)
+        
+        #print(model.type)
+        #print(type(model))
         # Create a temporary directory to save training checkpoints
         with TemporaryDirectory() as tempdir:
             best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
@@ -40,9 +43,11 @@ class CNN(Model):
                     if phase == 'train':
                         model.train() 
                         dataloader = train_loader
+                        datasize = dataset_sizes[0]
                     else:
                         model.eval() 
                         dataloader = val_loader
+                        datasize = dataset_sizes[1]
 
                     running_loss = 0.0
                     running_corrects = 0
@@ -73,8 +78,8 @@ class CNN(Model):
                     if phase == 'train':
                         scheduler.step()
 
-                    epoch_loss = running_loss / dataset_sizes[phase]
-                    epoch_acc = running_corrects.double() / dataset_sizes[phase]
+                    epoch_loss = running_loss / datasize
+                    epoch_acc = running_corrects.double() / datasize
 
                     print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
@@ -91,10 +96,5 @@ class CNN(Model):
 
             # load best model weights
             model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
-        return model
-        
-    
-    def evaluate(self, val_dataset, **kwargs):
-        logging.info('Evaluating model')
-        # evaluate the model
-        pass
+            print(type(model))
+        return best_acc
