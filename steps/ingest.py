@@ -1,16 +1,26 @@
 import logging
+import mlflow.data
+import mlflow.data
+import mlflow.data.dataset_source
 import torchvision
 import os
+import mlflow
 from typing import Tuple, Annotated
 from dataset import ImageFolder
 from zenml import step
+from zen_client import experiment_tracker
 
-
-@step
-def ingest(root:str="hymenoptera_data") -> Tuple[Annotated[torchvision.datasets.ImageFolder, 'train'], Annotated[torchvision.datasets.ImageFolder, 'val']]:
+@step(experiment_tracker=experiment_tracker)
+def ingest(root:str="hymenoptera_data") \
+        -> Tuple[Annotated[torchvision.datasets.ImageFolder, 'train'],
+                Annotated[torchvision.datasets.ImageFolder, 'val']]:
+        
     logging.info('Ingesting data')
     
     train_path = os.path.join(root, 'train')
     val_path = os.path.join(root, 'val')
     
-    return ImageFolder(train_path), ImageFolder(val_path)
+    train_dataset = ImageFolder(train_path)
+    val_dataset = ImageFolder(val_path)
+    
+    return train_dataset, val_dataset
