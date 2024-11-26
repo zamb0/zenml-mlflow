@@ -1,12 +1,17 @@
 import logging
 import torchvision
+import mlflow
 from typing import Tuple, Annotated
 from torchvision import transforms
 from zenml import step
+from zen_client import experiment_tracker
 
-
-@step
-def transform(train_dataset: torchvision.datasets.ImageFolder, val_dataset:torchvision.datasets.ImageFolder) ->  Tuple[Annotated[torchvision.datasets.ImageFolder, 'train'], Annotated[torchvision.datasets.ImageFolder, 'val']]:
+@step(experiment_tracker=experiment_tracker)
+def transform(train_dataset: torchvision.datasets.ImageFolder, 
+              val_dataset:torchvision.datasets.ImageFolder) \
+        -> Tuple[Annotated[torchvision.datasets.ImageFolder, 'train'], 
+                Annotated[torchvision.datasets.ImageFolder, 'val']]:
+        
     logging.info('Transforming data')
     
     train_transformation = transforms.Compose([
