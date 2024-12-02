@@ -1,21 +1,24 @@
-import logging
 import os
 import time
 import torch
-from typing import Tuple, Annotated
+from typing import Annotated
 from tempfile import TemporaryDirectory
 from torch import nn
 from torchvision import models
 from abc import ABC, abstractmethod
-from torch import from_numpy
-import numpy as np
 from config import Config
 from torchvision.datasets import ImageFolder
 
 class Model(ABC):
+    """
+    Abstract class for the model
+    """
+    
     @abstractmethod
-    #def train_model(self, train_dataset, train_labels, val_dataset, val_labels, **kwargs):
     def train_model(self, train_dataset: ImageFolder, val_dataset: ImageFolder, **kwargs):
+        """
+        Train the model
+        """
         pass
 
 class CNN(Model):
@@ -25,10 +28,26 @@ class CNN(Model):
         self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
     
     # https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
-    # def train_model(self, train_dataset, train_labels, val_dataset, val_labels, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0], device="cpu") \
-    #     -> Annotated[float, 'accuracy']:
     def train_model(self, train_dataset: ImageFolder, val_dataset: ImageFolder, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0], device="cpu") \
-    -> Annotated[float, 'accuracy']:
+                    -> Annotated[float, 'accuracy']:
+        """
+        Train the model
+        
+        Args:
+        
+            train_dataset: ImageFolder: Training dataset
+            val_dataset: ImageFolder: Validation dataset
+            criterion: nn.Module: Loss function
+            optimizer: torch.optim: Optimizer
+            scheduler: torch.optim: Scheduler
+            num_epochs: int: Number of epochs
+            dataset_sizes: List[int]: Dataset sizes
+            device: str: Device to train the model
+            
+        Returns:
+            float: Accuracy
+        """
+        
         since = time.time()
         model = self.model.to(device)
         

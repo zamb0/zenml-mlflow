@@ -1,15 +1,25 @@
-from zenml import step
-from zenml.integrations.mlflow.services import MLFlowDeploymentService
-from torchvision.datasets import ImageFolder
-from typing import Tuple
 import numpy as np
 import torch
 import torchvision
 import mlflow
+from zenml import step
+from zenml.integrations.mlflow.services import MLFlowDeploymentService
+from torchvision.datasets import ImageFolder
+from typing import Tuple
 from zen_client import experiment_tracker
 
 @step(experiment_tracker=experiment_tracker.name)
 def predictor(service: MLFlowDeploymentService, data: ImageFolder) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Step to predict the labels of the images
+    
+    Args:
+        service: MLFlowDeploymentService: Inference service
+        data: ImageFolder: Data to predict
+        
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Predictions and true
+    """
     service.start(timeout=60)
     
     data.transform = torchvision.transforms.Compose([

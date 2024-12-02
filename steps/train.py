@@ -1,14 +1,13 @@
 import logging
 import torch
-import torchvision
 import mlflow
+import numpy as np
 from zenml import step
 from src.model import CNN
 from typing import Tuple, Annotated
 from config import Config
 from zen_client import experiment_tracker
 from mlflow.models.signature import infer_signature
-import numpy as np
 from torchvision.datasets import ImageFolder
 
 @step(experiment_tracker=experiment_tracker.name, enable_cache=False)
@@ -16,6 +15,16 @@ def train(train_dataset: ImageFolder,
           val_dataset: ImageFolder) \
         -> Tuple[Annotated[torch.nn.Module, Config.model_name], 
                  Annotated[float, 'accuracy']]:
+    """
+    Step to train the model
+    
+    Args:
+        train_dataset: ImageFolder: Training dataset
+        val_dataset: ImageFolder: Validation dataset
+        
+    Returns:
+        Tuple[torch.nn.Module, float]: Trained model and accuracy
+    """
           
     logging.info('Training model')
     mlflow.pytorch.autolog() 

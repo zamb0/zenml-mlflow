@@ -2,12 +2,21 @@ import logging
 from typing import Tuple, Annotated
 from torchvision import transforms
 from zenml import step
-from zen_client import experiment_tracker
 from torchvision.datasets import ImageFolder
 
 @step()
 def transform(train_dataset: ImageFolder = None, val_dataset:ImageFolder = None) \
             -> Tuple[Annotated[ImageFolder, 'train_dataset'], Annotated[ImageFolder, 'val_dataset']]:
+    """
+    Step to transform the data
+    
+    Args:
+        train_dataset: ImageFolder: Training dataset
+        val_dataset: ImageFolder: Validation dataset
+        
+    Returns:
+        Tuple[ImageFolder, ImageFolder]: Transformed datasets
+    """
         
     logging.info('Transforming data')
     
