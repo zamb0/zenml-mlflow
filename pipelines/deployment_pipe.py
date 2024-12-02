@@ -27,7 +27,12 @@ def deployment_pipeline(min_accuracy: float=0.92, workers: int=1, timeout: int =
     train_dataset, val_dataset = transform(train_dataset, val_dataset)
     model, accuracy = train(train_dataset, val_dataset)
     decision = deployment_trigger(accuracy, min_accuracy)
-    mlflow_model_deployer_step(model=model, deploy_decision=decision, workers=workers, timeout=timeout, model_name=Config.model_name)
+    mlflow_model_deployer_step(model=model, 
+                               deploy_decision=decision, 
+                               workers=workers, 
+                               timeout=timeout, 
+                               model_name=Config.model_name, 
+                               experiment_name=Config.experiment_name)
     
 
 @pipeline(enable_cache=False, settings={"docker": docker_settings})
