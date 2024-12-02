@@ -7,10 +7,15 @@ from tempfile import TemporaryDirectory
 from torch import nn
 from torchvision import models
 from abc import ABC, abstractmethod
+from torch import from_numpy
+import numpy as np
+from config import Config
+from torchvision.datasets import ImageFolder
 
 class Model(ABC):
     @abstractmethod
-    def train_model(self, train_loader, val_loader, **kwargs):
+    #def train_model(self, train_dataset, train_labels, val_dataset, val_labels, **kwargs):
+    def train_model(self, train_dataset: ImageFolder, val_dataset: ImageFolder, **kwargs):
         pass
 
 class CNN(Model):
@@ -20,13 +25,16 @@ class CNN(Model):
         self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
     
     # https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
-    def train_model(self, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0], device="cpu") \
-        -> Annotated[float, 'accuracy']:
+    # def train_model(self, train_dataset, train_labels, val_dataset, val_labels, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0], device="cpu") \
+    #     -> Annotated[float, 'accuracy']:
+    def train_model(self, train_dataset: ImageFolder, val_dataset: ImageFolder, criterion, optimizer, scheduler, num_epochs=25, dataset_sizes=[0], device="cpu") \
+    -> Annotated[float, 'accuracy']:
         since = time.time()
         model = self.model.to(device)
         
-        #print(model.type)
-        #print(type(model))
+        data_loader_train = torch.utils.data.DataLoader(train_dataset, batch_size=Config.batch_size, shuffle=True)
+        data_loader_val = torch.utils.data.DataLoader(val_dataset, batch_size=Config.batch_size, shuffle=True)
+        
         # Create a temporary directory to save training checkpoints
         with TemporaryDirectory() as tempdir:
             best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
@@ -42,18 +50,17 @@ class CNN(Model):
                 for phase in ['train', 'val']:
                     if phase == 'train':
                         model.train() 
-                        dataloader = train_loader
+                        data_loader = data_loader_train
                         datasize = dataset_sizes[0]
                     else:
                         model.eval() 
-                        dataloader = val_loader
+                        data_loader = data_loader_val
                         datasize = dataset_sizes[1]
 
                     running_loss = 0.0
                     running_corrects = 0
 
-                    # Iterate over data.
-                    for inputs, labels in dataloader:
+                    for inputs, labels in data_loader:
                         inputs = inputs.to(device)
                         labels = labels.to(device)
 
@@ -96,5 +103,4 @@ class CNN(Model):
 
             # load best model weights
             model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
-            print(type(model))
         return best_acc

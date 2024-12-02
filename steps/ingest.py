@@ -6,14 +6,14 @@ import torchvision
 import os
 import mlflow
 from typing import Tuple, Annotated
-from dataset import ImageFolder
 from zenml import step
 from zen_client import experiment_tracker
+from torchvision.datasets import ImageFolder
 
 @step(experiment_tracker=experiment_tracker)
 def ingest(root:str="hymenoptera_data") \
-        -> Tuple[Annotated[torchvision.datasets.ImageFolder, 'train'],
-                Annotated[torchvision.datasets.ImageFolder, 'val']]:
+        -> Tuple[Annotated[ImageFolder, 'train'],
+                Annotated[ImageFolder, 'val']]:
         
     logging.info('Ingesting data')
     
