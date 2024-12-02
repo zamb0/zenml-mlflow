@@ -26,6 +26,12 @@ def predictor(service: MLFlowDeploymentService, data: ImageFolder) -> Tuple[np.n
         labels = label
         break
     
+    for i, image in enumerate(images):
+        mlflow.log_image(image.permute(1, 2, 0).numpy(), key=f'image_{i}')
+        
+    for i, label in enumerate(labels):
+        mlflow.log_metric(value=label, key=f'true_label_{i}')
+    
     prediction = service.predict(images.numpy())
     
     return prediction, labels.numpy()
