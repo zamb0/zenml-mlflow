@@ -5,7 +5,7 @@ import os
 import logging
 from torchvision.datasets import ImageFolder
 
-@step()
+@step(enable_cache=False)
 def dynamic_importer(root:str="hymenoptera_data") \
         -> Annotated[torchvision.datasets.ImageFolder, 'data']:
         

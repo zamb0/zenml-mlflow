@@ -11,14 +11,14 @@ from mlflow.models.signature import infer_signature
 import numpy as np
 from torchvision.datasets import ImageFolder
 
-@step(experiment_tracker=experiment_tracker, enable_cache=False)
+@step(experiment_tracker=experiment_tracker.name, enable_cache=False)
 def train(train_dataset: ImageFolder,
           val_dataset: ImageFolder) \
         -> Tuple[Annotated[torch.nn.Module, Config.model_name], 
                  Annotated[float, 'accuracy']]:
           
     logging.info('Training model')
-
+    mlflow.pytorch.autolog() 
     mlflow.log_param('batch_size', Config.batch_size)
     mlflow.log_param('lr', Config.lr)
     mlflow.log_param('momentum', Config.momentum)

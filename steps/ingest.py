@@ -10,7 +10,7 @@ from zenml import step
 from zen_client import experiment_tracker
 from torchvision.datasets import ImageFolder
 
-@step(experiment_tracker=experiment_tracker)
+@step(enable_cache=True)
 def ingest(root:str="hymenoptera_data") \
         -> Tuple[Annotated[ImageFolder, 'train'],
                 Annotated[ImageFolder, 'val']]:

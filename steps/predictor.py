@@ -5,8 +5,10 @@ from typing import Tuple
 import numpy as np
 import torch
 import torchvision
+import mlflow
+from zen_client import experiment_tracker
 
-@step()
+@step(experiment_tracker=experiment_tracker.name)
 def predictor(service: MLFlowDeploymentService, data: ImageFolder) -> Tuple[np.ndarray, np.ndarray]:
     service.start(timeout=60)
     

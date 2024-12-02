@@ -5,7 +5,7 @@ from zenml import step
 from zen_client import experiment_tracker
 from torchvision.datasets import ImageFolder
 
-@step(experiment_tracker=experiment_tracker)
+@step()
 def transform(train_dataset: ImageFolder = None, val_dataset:ImageFolder = None) \
             -> Tuple[Annotated[ImageFolder, 'train_dataset'], Annotated[ImageFolder, 'val_dataset']]:
         

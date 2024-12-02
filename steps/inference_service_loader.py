@@ -6,7 +6,7 @@ from zen_client import experiment_tracker
 from zenml.integrations.mlflow.services import MLFlowDeploymentService
 from zenml.integrations.mlflow.model_deployers.mlflow_model_deployer import MLFlowModelDeployer
 
-@step(enable_cache=False, experiment_tracker=experiment_tracker)
+@step(enable_cache=False)
 def inference_service_loader(pipeline_name: str, pipeline_step_name: str, running: bool, model_name: str = 'model') -> MLFlowDeploymentService:
     logging.info('Evaluating model') 
     
